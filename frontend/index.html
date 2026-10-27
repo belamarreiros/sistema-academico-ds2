@@ -57,6 +57,11 @@
     <script src="./js/model/aluno-model.js" defer></script>
 
     <!--
+        Carrega a camada Service.
+    -->
+    <script src="./js/service/aluno-service.js" defer></script>
+
+    <!--
         Carrega a camada View.
 
         Nesta versão, a View será responsável por:
@@ -211,9 +216,17 @@
                 </div>
 
                 <!-- Botão responsável pelo envio do formulário. -->
-                <button type="submit">
-                    Cadastrar aluno
-                </button>
+
+                <div class="acoes-formulario">
+                    <button type="submit">
+                        Cadastrar aluno
+                    </button>
+
+                    <button type="button" id="btn-limpar-dados" class="botao-secundario">
+                        Limpar dados
+                    </button>
+                </div>
+
             </form>
 
             <!--
