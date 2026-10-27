@@ -1,155 +1,222 @@
 
 /*
- * SELETOR UNIVERSAL
- *
- * O caractere * representa e seleciona todos os elementos da página.
+ * Faz todos os elementos considerarem padding e border
+ * dentro de suas dimensões.
  */
 * {
-    /*
-     * Faz com que padding e border sejam considerados
-     * dentro da largura e da altura definidas.
-     *
-     * Sem border-box, o padding seria acrescentado ao tamanho
-     * do elemento, aumentando suas dimensões finais.
-     */
     box-sizing: border-box;
 }
 
 /*
- * CONFIGURAÇÃO GERAL DA PÁGINA
- *
- * O seletor body representa todo o conteúdo visível
- * do documento HTML.
+ * Configurações gerais da página.
  */
 body {
-    /*
-     * Remove a margem que o navegador adiciona
-     * automaticamente ao redor da página.
-     */
     margin: 0;
-
-    /*
-     * Define a altura mínima como 100% da altura da tela.
-     *
-     * vh significa viewport height, isto é, altura da janela.
-     * Portanto, 100vh representa toda a altura visível
-     * da janela do navegador.
-     */
     min-height: 100vh;
-
-    /*
-     * Ativa o Flexbox.
-     *
-     * Isso permite controlar mais facilmente o alinhamento
-     * dos elementos filhos do body.
-     *
-     * Neste projeto, o elemento filho principal é main.
-     */
-    display: flex;
-
-    /*
-     * Centraliza o conteúdo verticalmente.
-     *
-     * Como o Flexbox está na direção padrão row,
-     * align-items controla o eixo vertical.
-     */
-    align-items: center;
-
-    /*
-     * Centraliza o conteúdo horizontalmente.
-     *
-     * justify-content controla o eixo principal,
-     * que neste caso é o eixo horizontal.
-     */
-    justify-content: center;
-
-    /*
-     * Define a fonte utilizada na página.
-     *
-     * O navegador tentará utilizar Arial.
-     * Se Arial não estiver disponível, utilizará
-     * outra fonte sem serifa.
-     */
     font-family: Arial, sans-serif;
-
-    /*
-     * Define uma cor de fundo cinza-clara para a página.
-     */
     background-color: #f4f7f9;
-
-    /*
-     * Define a cor padrão dos textos da página.
-     *
-     * Foi utilizada uma cor escura para manter
-     * uma boa leitura sobre o fundo claro.
-     */
-    color: #263747;
+    color: #1f2937;
 }
 
 /*
- * CONTEÚDO PRINCIPAL
- *
- * O seletor main representa a área principal da aplicação.
+ * Limita a largura do conteúdo e o mantém centralizado.
  */
-main {
-    /*
-     * Define uma largura mínima de 90% da tela,
-     * respeitando o limite máximo de 700 pixels.
-     *
-     * Em telas grandes, o elemento terá no máximo 700px.
-     * Em telas menores, utilizará 90% da largura disponível.
-     *
-     * Isso ajuda a manter o layout responsivo.
-     */
-    width: min(90%, 700px);
+.container {
+    width: min(92%, 1100px);
+    margin: 0 auto;
+}
 
-    /*
-     * Adiciona um espaço interno de 32px.
-     *
-     * Esse espaço impede que o texto fique encostado
-     * nas bordas do elemento.
-     */
-    padding: 32px;
+/*
+ * Cabeçalho da aplicação.
+ */
+.cabecalho {
+    padding: 28px 0;
+    background-color: #0f3d66;
+    color: #ffffff;
+}
 
-    /*
-     * Arredonda os cantos do elemento.
-     */
+.cabecalho h1 {
+    margin: 0;
+}
+
+.cabecalho p {
+    margin-bottom: 0;
+}
+
+/*
+ * Conteúdo principal.
+ */
+main.container {
+    padding: 32px 0;
+}
+
+/*
+ * Cartões da interface.
+ */
+.cartao {
+    margin-bottom: 24px;
+    padding: 24px;
     border-radius: 8px;
-
-    /*
-     * Define o fundo branco do conteúdo principal.
-     */
     background-color: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
 
-    /*
-     * Adiciona uma sombra ao redor do elemento.
-     *
-     * Os valores representam:
-     * - 0: deslocamento horizontal;
-     * - 8px: deslocamento vertical;
-     * - 24px: nível de desfoque;
-     * - rgba: cor preta com 8% de opacidade.
-     */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+.cartao h2 {
+    margin-top: 0;
+    color: #0f3d66;
 }
 
 /*
- * TÍTULO PRINCIPAL
- *
- * O seletor h1 aplica os estilos ao título de nível 1.
+ * Organiza os campos do formulário em colunas.
  */
-h1 {
-    /*
-     * Remove a margem superior adicionada
-     * automaticamente pelo navegador.
-     *
-     * Isso evita um espaço excessivo entre o título
-     * e o início do elemento main.
-     */
-    margin-top: 0;
+.grade-formulario {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
 
-    /*
-     * Define a cor do título utilizando um tom de azul.
-     */
-    color: #0f3d66;
+/*
+ * Organiza label e input verticalmente.
+ */
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo label {
+    font-weight: bold;
+}
+
+/*
+ * Aparência dos campos de entrada.
+ */
+.campo input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.campo input:focus {
+    border-color: #0f3d66;
+    outline: 2px solid rgba(15, 61, 102, 0.15);
+}
+
+/*
+ * Botão principal do formulário.
+ */
+button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    background-color: #0f3d66;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0b2f50;
+}
+
+/*
+ * Área de mensagens.
+ */
+.mensagem {
+    min-height: 24px;
+    margin-top: 16px;
+    font-weight: bold;
+}
+
+.mensagem.sucesso {
+    color: #166534;
+}
+
+.mensagem.erro {
+    color: #b91c1c;
+}
+
+/*
+ * Organiza o título e o contador de alunos lado a lado.
+ */
+.titulo-secao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.titulo-secao p {
+    margin: 0;
+}
+
+/*
+ * Permite rolagem horizontal em telas pequenas.
+ */
+.tabela-responsiva {
+    overflow-x: auto;
+}
+
+/*
+ * Configurações da tabela.
+ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px;
+    border-bottom: 1px solid #d9e0e7;
+    text-align: left;
+}
+
+th {
+    background-color: #0f3d66;
+    color: #ffffff;
+}
+
+tbody tr:hover {
+    background-color: #f4f7f9;
+}
+
+/*
+ * Área utilizada para apresentar o JSON.
+ */
+pre {
+    max-height: 350px;
+    margin: 0;
+    padding: 16px;
+    overflow: auto;
+    border-radius: 6px;
+    background-color: #f1f5f9;
+    color: #1f2937;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/*
+ * Ajustes para telas pequenas.
+ */
+@media (max-width: 600px) {
+    .grade-formulario {
+        grid-template-columns: 1fr;
+    }
+
+    .titulo-secao {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .cartao {
+        padding: 18px;
+    }
 }

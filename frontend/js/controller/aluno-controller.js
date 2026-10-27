@@ -1,167 +1,103 @@
 /*
- * CONTROLLER DE ALUNOS
+ * CONTROLLER DE ALUNOS — VERSÃO COM DOM
  *
- * O Controller coordena o funcionamento da aplicação.
- *
- * Ele é responsável por:
- * - solicitar dados à View;
- * - enviar os dados ao Model;
- * - receber o resultado do Model;
- * - decidir qual método da View será executado;
- * - controlar a repetição dos cadastros;
- * - coordenar a conversão dos dados para JSON.
- *
- * O Controller não deve:
- * - validar campos;
- * - verificar RA duplicado;
- * - realizar cálculos;
- * - armazenar os alunos;
- * - apresentar diretamente mensagens no console.
+ * O Controller:
+ * - inicia a aplicação;
+ * - coordena a comunicação entre as camadas;
+ * - envia os dados ao Model;
+ * - analisa o resultado;
+ * - solicita a atualização da View.
  */
 const AlunoController = {
   /*
-   * Método que inicia o funcionamento da aplicação.
-   *
-   * Quando esse método for chamado, o processo de cadastro
-   * começará e continuará enquanto o usuário desejar.
+   * Inicia a aplicação.
    */
   iniciar() {
     /*
-     * Variável que controla a repetição dos cadastros.
-     *
-     * Ela começa com true para que o laço while
-     * seja executado pelo menos uma vez.
+     * Solicita que a View localize os elementos HTML.
      */
-    let continuar = true;
+    AlunoView.inicializar();
 
     /*
-     * O laço será repetido enquanto continuar for true.
-     *
-     * A cada repetição, o usuário poderá cadastrar
-     * um novo aluno.
+     * Entrega uma função para a View executar
+     * quando o formulário for enviado.
      */
-    while (continuar) {
-      /*
-       * Solicita que a View leia os dados do usuário.
-       *
-       * lerDados() devolve um objeto com:
-       * - ra;
-       * - nome;
-       * - email;
-       * - curso;
-       * - turma.
-       *
-       * O Controller não utiliza prompt() diretamente.
-       */
-      const dados = AlunoView.lerDados();
+    AlunoView.configurarFormulario(function (dados) {
+      AlunoController.cadastrar(dados);
+    });
 
-      /*
-       * Envia os dados para o Model.
-       *
-       * O Model será responsável por:
-       * - normalizar os campos;
-       * - validar os campos;
-       * - validar o e-mail;
-       * - verificar se o RA já existe;
-       * - criar e armazenar o aluno.
-       *
-       * cadastrar() devolve um objeto informando
-       * se a operação foi bem-sucedida.
-       */
-      const resultado = AlunoModel.cadastrar(dados);
+    /*
+     * Apresenta o estado inicial da aplicação.
+     *
+     * Como ainda não existem alunos, a tabela mostrará
+     * a mensagem "Nenhum aluno foi cadastrado."
+     */
+    AlunoController.atualizarVisualizacao();
+  },
 
-      /*
-       * Verifica a propriedade sucesso do resultado.
-       *
-       * Se resultado.sucesso for true, significa
-       * que o aluno foi cadastrado corretamente.
-       */
-      if (resultado.sucesso) {
-        /*
-         * Solicita que a View apresente o aluno.
-         *
-         * O Controller não utiliza console.log()
-         * ou console.table() diretamente.
-         */
-        AlunoView.exibirAluno(resultado.aluno);
-      } else {
-        /*
-         * Se resultado.sucesso for false,
-         * solicita que a View apresente o erro
-         * identificado pelo Model.
-         */
-        AlunoView.exibirErro(resultado.mensagem);
-      }
+  /*
+   * Coordena o cadastro de um aluno.
+   */
+  cadastrar(dados) {
+    /*
+     * Envia os dados para o Model.
+     */
+    const resultado = AlunoModel.cadastrar(dados);
 
-      /*
-       * Pergunta se o usuário deseja cadastrar outro aluno.
-       *
-       * perguntarNovoCadastro() devolve true ou false.
-       */
-      continuar = AlunoView.perguntarNovoCadastro();
+    /*
+     * Se o Model identificar algum problema,
+     * apresenta o erro e encerra este método.
+     */
+    if (!resultado.sucesso) {
+      AlunoView.exibirErro(resultado.mensagem);
+      return;
     }
 
     /*
-     * Quando o usuário encerrar os cadastros,
-     * apresenta a lista completa de alunos.
+     * Apresenta a confirmação do cadastro.
+     */
+    AlunoView.exibirSucesso(
+      `Aluno ${resultado.aluno.nome} cadastrado com sucesso.`,
+    );
+
+    /*
+     * Limpa o formulário.
+     */
+    AlunoView.limparFormulario();
+
+    /*
+     * Atualiza a tabela e o JSON.
+     */
+    AlunoController.atualizarVisualizacao();
+  },
+
+  /*
+   * Atualiza todas as representações da lista de alunos.
+   */
+  atualizarVisualizacao() {
+    /*
+     * Solicita ao Model a lista atual.
      */
     const alunos = AlunoModel.listar();
 
     /*
-     * Envia a lista para a View apresentar.
-     *
-     * A View mostrará a quantidade de alunos e,
-     * caso existam registros, exibirá uma tabela.
+     * Solicita que a View monte a tabela.
      */
     AlunoView.exibirLista(alunos);
 
     /*
-     * Converte o array de alunos em um texto JSON.
-     *
-     * Primeiro parâmetro:
-     * alunos — valor que será convertido.
-     *
-     * Segundo parâmetro:
-     * null — não será aplicado um filtro na conversão.
-     *
-     * Terceiro parâmetro:
-     * 2 — quantidade de espaços utilizada na indentação.
-     *
-     * A indentação deixa o JSON mais fácil de ler.
+     * Converte o array para texto JSON formatado.
      */
-    const textoJSON = JSON.stringify(alunos, null, 2);
+    const textoJson = JSON.stringify(alunos, null, 2);
 
     /*
-     * Solicita que a View apresente o texto JSON.
-     *
-     * Neste momento, textoJSON é uma string.
-     * Ele não é mais um array que possa ser manipulado
-     * diretamente como uma lista de alunos.
+     * Solicita que a View apresente o JSON.
      */
-    AlunoView.exibirJSON(textoJSON);
-
-    /*
-     * Converte o texto JSON novamente em um valor JavaScript.
-     *
-     * Como o JSON foi criado a partir de um array,
-     * JSON.parse() produzirá um novo array de objetos.
-     */
-    const dadosRecuperados = JSON.parse(textoJSON);
-
-    /*
-     * Solicita que a View apresente os dados reconstruídos.
-     *
-     * Isso demonstra que o JSON pode ser utilizado
-     * para transportar informações e depois reconstruí-las.
-     */
-    AlunoView.exibirDadosReconstruidos(dadosRecuperados);
+    AlunoView.exibirJSON(textoJson);
   },
 };
 
 /*
- * Inicia a aplicação.
- *
- * Sem esta chamada, o objeto AlunoController existiria,
- * mas o processo de cadastro não seria executado.
+ * Inicia a aplicação depois que os scripts forem carregados.
  */
 AlunoController.iniciar();

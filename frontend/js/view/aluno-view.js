@@ -1,165 +1,196 @@
 /*
- * VIEW DE ALUNOS
+ * VIEW DE ALUNOS — VERSÃO COM DOM
  *
- * A View é responsável pela interação com o usuário.
- *
- * Nesta primeira versão, ela utiliza:
- * - prompt() para receber informações;
- * - confirm() para fazer uma pergunta;
- * - console.log() para apresentar mensagens;
- * - console.table() para apresentar objetos e arrays;
- * - console.error() para apresentar erros.
- *
- * A View não deve:
- * - validar e-mail;
- * - verificar RA duplicado;
- * - cadastrar o aluno;
- * - armazenar os dados;
- * - aplicar regras de negócio.
- *
- * Essas responsabilidades pertencem ao Model.
+ * Esta View é responsável por:
+ * - localizar elementos HTML;
+ * - ler os campos do formulário;
+ * - observar o evento submit;
+ * - apresentar mensagens;
+ * - montar a tabela;
+ * - apresentar o JSON.
  */
 const AlunoView = {
   /*
-   * Solicita as informações necessárias para o cadastro.
+   * Objeto que armazenará referências aos elementos HTML.
    *
-   * Cada chamada de prompt() apresenta uma caixa de entrada
-   * e devolve o valor digitado pelo usuário.
+   * Isso evita repetir document.getElementById()
+   * várias vezes durante a execução.
+   */
+  elementos: {},
+
+  /*
+   * Localiza e armazena os elementos da página.
    *
-   * Os valores são reunidos em um único objeto.
+   * Este método deve ser executado antes dos demais.
+   */
+  inicializar() {
+    AlunoView.elementos.formulario = document.getElementById("form-aluno");
+
+    AlunoView.elementos.ra = document.getElementById("ra");
+
+    AlunoView.elementos.nome = document.getElementById("nome");
+
+    AlunoView.elementos.email = document.getElementById("email");
+
+    AlunoView.elementos.curso = document.getElementById("curso");
+
+    AlunoView.elementos.turma = document.getElementById("turma");
+
+    AlunoView.elementos.mensagem = document.getElementById("mensagem");
+
+    AlunoView.elementos.tabela = document.getElementById("corpo-tabela-alunos");
+
+    AlunoView.elementos.totalAlunos = document.getElementById("total-alunos");
+
+    AlunoView.elementos.saidaJson = document.getElementById("saida-json");
+  },
+
+  /*
+   * Registra uma função que será executada quando
+   * o formulário for enviado.
+   *
+   * O parâmetro aoEnviar é uma função recebida
+   * do Controller.
+   */
+  configurarFormulario(aoEnviar) {
+    AlunoView.elementos.formulario.addEventListener(
+      "submit",
+      function (evento) {
+        /*
+         * Impede o comportamento padrão do formulário,
+         * que seria recarregar a página.
+         */
+        evento.preventDefault();
+
+        /*
+         * Lê os valores atuais do formulário.
+         */
+        const dados = AlunoView.lerDados();
+
+        /*
+         * Envia os dados para a função fornecida
+         * pelo Controller.
+         */
+        aoEnviar(dados);
+      },
+    );
+  },
+
+  /*
+   * Lê a propriedade value de cada campo.
+   *
+   * A View apenas coleta os valores.
+   * A normalização e a validação pertencem ao Model.
    */
   lerDados() {
     return {
-      ra: prompt("Digite o RA do aluno:"),
-      nome: prompt("Digite o nome do aluno:"),
-      email: prompt("Digite o e-mail do aluno:"),
-      curso: prompt("Digite o curso:"),
-      turma: prompt("Digite a turma:"),
+      ra: AlunoView.elementos.ra.value,
+      nome: AlunoView.elementos.nome.value,
+      email: AlunoView.elementos.email.value,
+      curso: AlunoView.elementos.curso.value,
+      turma: AlunoView.elementos.turma.value,
     };
   },
 
   /*
-   * Apresenta o aluno que foi cadastrado com sucesso.
-   *
-   * O parâmetro aluno recebe o objeto criado pelo Model
-   * e encaminhado pelo Controller.
+   * Apresenta uma mensagem de sucesso.
    */
-  exibirAluno(aluno) {
-    /*
-     * Apresenta uma mensagem simples no console.
-     */
-    console.log("Aluno cadastrado com sucesso.");
+  exibirSucesso(mensagem) {
+    AlunoView.elementos.mensagem.textContent = mensagem;
 
     /*
-     * console.table() apresenta os dados do objeto
-     * em formato de tabela, facilitando a leitura.
+     * Define as classes utilizadas no CSS.
      */
-    console.table(aluno);
+    AlunoView.elementos.mensagem.className = "mensagem sucesso";
   },
 
   /*
    * Apresenta uma mensagem de erro.
-   *
-   * A View apenas apresenta a mensagem recebida.
-   * Ela não identifica o problema.
-   *
-   * O parâmetro mensagem será enviado pelo Controller,
-   * depois que o Model identificar o problema.
    */
   exibirErro(mensagem) {
-    /*
-     * console.error() apresenta a mensagem como erro.
-     *
-     * Dependendo do navegador, a mensagem poderá aparecer
-     * em vermelho ou com um ícone de alerta.
-     */
-    console.error("Erro:", mensagem);
+    AlunoView.elementos.mensagem.textContent = mensagem;
+
+    AlunoView.elementos.mensagem.className = "mensagem erro";
   },
 
   /*
-   * Pergunta ao usuário se deseja realizar outro cadastro.
-   *
-   * confirm() apresenta uma janela com duas opções:
-   * - OK, que devolve true;
-   * - Cancelar, que devolve false.
-   *
-   * Esse valor será utilizado pelo Controller para decidir
-   * se o processo de cadastro deverá continuar.
+   * Limpa os campos depois de um cadastro bem-sucedido.
    */
-  perguntarNovoCadastro() {
-    return confirm("Deseja cadastrar outro aluno?");
+  limparFormulario() {
+    AlunoView.elementos.formulario.reset();
+
+    /*
+     * Devolve o foco ao campo RA para facilitar
+     * o próximo cadastro.
+     */
+    AlunoView.elementos.ra.focus();
   },
 
   /*
-   * Apresenta a lista completa de alunos.
-   *
-   * O parâmetro alunos deverá receber um array.
+   * Devolve a referência ao corpo da tabela.
+   */
+  obterCorpoTabela() {
+    return AlunoView.elementos.tabela;
+  },
+
+  /*
+   * Atualiza o contador de alunos.
+   */
+  atualizarTotal(quantidade) {
+    AlunoView.elementos.totalAlunos.textContent = `Total: ${quantidade}`;
+  },
+
+  /*
+   * Apresenta a lista de alunos na tabela.
    */
   exibirLista(alunos) {
-    /*
-     * A propriedade length informa a quantidade
-     * de elementos existentes no array.
-     */
-    console.log("Quantidade de alunos cadastrados:", alunos.length);
+    const corpo = AlunoView.elementos.tabela;
 
     /*
-     * Verifica se o array está vazio.
-     *
-     * Se length for igual a zero, nenhum aluno
-     * foi cadastrado.
+     * Remove as linhas anteriores.
      */
-    if (alunos.length === 0) {
-      console.log("Nenhum aluno foi cadastrado.");
+    corpo.innerHTML = "";
+
+    /*
+     * Cria uma linha para cada aluno cadastrado.
+     */
+    alunos.forEach((aluno) => {
+      const linha = document.createElement("tr");
 
       /*
-       * O return encerra a execução deste método.
-       *
-       * Dessa maneira, console.table() não será
-       * executado quando não existirem alunos.
+       * Cria as células com os dados do aluno.
        */
-      return;
-    }
+      const valores = [
+        aluno.id,
+        aluno.ra,
+        aluno.nome,
+        aluno.email,
+        aluno.curso,
+        aluno.turma,
+        aluno.ativo ? "Ativo" : "Inativo",
+      ];
+
+      valores.forEach((valor) => {
+        const celula = document.createElement("td");
+
+        celula.textContent = valor;
+
+        linha.appendChild(celula);
+      });
+
+      corpo.appendChild(linha);
+    });
 
     /*
-     * Se o array possuir alunos, apresenta todos
-     * os registros em formato de tabela.
+     * Atualiza a quantidade de alunos apresentados.
      */
-    console.table(alunos);
+    AlunoView.atualizarTotal(alunos.length);
   },
 
   /*
-   * Apresenta os alunos convertidos para formato JSON.
-   *
-   * O parâmetro textoJSON recebe uma string criada
-   * anteriormente por JSON.stringify().
+   * Apresenta os dados em formato JSON.
    */
-  exibirJSON(textoJSON) {
-    console.log("Alunos em formato JSON:");
-
-    /*
-     * Neste momento, o conteúdo apresentado é texto.
-     * Ele não é mais um array que possa ser manipulado
-     * diretamente pelo JavaScript.
-     */
-    console.log(textoJSON);
-  },
-
-  /*
-   * Apresenta os dados reconstruídos com JSON.parse().
-   *
-   * Depois da conversão, os dados deixam de ser apenas
-   * um texto JSON e voltam a ser valores JavaScript.
-   *
-   * Neste projeto, o resultado será novamente
-   * um array de objetos.
-   */
-  exibirDadosReconstruidos(dados) {
-    console.log("Dados reconstruídos com JSON.parse():");
-
-    /*
-     * Como dados voltou a ser um array de objetos,
-     * podemos apresentá-lo com console.table().
-     */
-    console.table(dados);
+  exibirJSON(alunos) {
+    AlunoView.elementos.saidaJson.textContent = JSON.stringify(alunos, null, 2);
   },
 };
