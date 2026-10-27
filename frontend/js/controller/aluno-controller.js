@@ -1,103 +1,116 @@
 /*
- * CONTROLLER DE ALUNOS — VERSÃO COM DOM
+ * CONTROLLER DE ALUNOS — VERSÃO 0.3
  *
- * O Controller:
- * - inicia a aplicação;
- * - coordena a comunicação entre as camadas;
- * - envia os dados ao Model;
- * - analisa o resultado;
- * - solicita a atualização da View.
+ * O Controller agora utiliza o Service.
+ *
+ * Ele não acessa diretamente:
+ * - localStorage;
+ * - arrays;
+ * - JSON.
  */
 const AlunoController = {
   /*
-   * Inicia a aplicação.
+   * Inicializa a aplicação.
    */
   iniciar() {
     /*
-     * Solicita que a View localize os elementos HTML.
+     * Inicializa as referências da View.
      */
     AlunoView.inicializar();
 
     /*
-     * Entrega uma função para a View executar
-     * quando o formulário for enviado.
+     * Configura o cadastro.
      */
     AlunoView.configurarFormulario(function (dados) {
       AlunoController.cadastrar(dados);
     });
 
     /*
-     * Apresenta o estado inicial da aplicação.
+     * Configura o botão Limpar dados.
+     */
+    AlunoView.configurarBotaoLimpar(function () {
+      AlunoController.limparDados();
+    });
+
+    /*
+     * Carrega e apresenta os dados já armazenados.
      *
-     * Como ainda não existem alunos, a tabela mostrará
-     * a mensagem "Nenhum aluno foi cadastrado."
+     * Isso faz os alunos voltarem para a tabela
+     * depois que a página for atualizada.
      */
     AlunoController.atualizarVisualizacao();
   },
 
   /*
-   * Coordena o cadastro de um aluno.
+   * Coordena o cadastro.
    */
   cadastrar(dados) {
-    /*
-     * Envia os dados para o Model.
-     */
-    const resultado = AlunoModel.cadastrar(dados);
+    const resultado = AlunoService.cadastrar(dados);
 
-    /*
-     * Se o Model identificar algum problema,
-     * apresenta o erro e encerra este método.
-     */
     if (!resultado.sucesso) {
       AlunoView.exibirErro(resultado.mensagem);
       return;
     }
 
-    /*
-     * Apresenta a confirmação do cadastro.
-     */
     AlunoView.exibirSucesso(
       `Aluno ${resultado.aluno.nome} cadastrado com sucesso.`,
     );
 
-    /*
-     * Limpa o formulário.
-     */
     AlunoView.limparFormulario();
 
-    /*
-     * Atualiza a tabela e o JSON.
-     */
     AlunoController.atualizarVisualizacao();
   },
 
   /*
-   * Atualiza todas as representações da lista de alunos.
+   * Coordena a remoção de todos os dados.
+   */
+  limparDados() {
+    const alunos = AlunoService.listar();
+
+    /*
+     * Evita solicitar confirmação quando
+     * a lista já estiver vazia.
+     */
+    if (alunos.length === 0) {
+      AlunoView.exibirErro("Não existem alunos para remover.");
+
+      return;
+    }
+
+    /*
+     * Solicita confirmação à View.
+     */
+    const confirmou = AlunoView.confirmarLimpeza();
+
+    if (!confirmou) {
+      return;
+    }
+
+    /*
+     * Solicita que o Service remova os dados.
+     */
+    AlunoService.limpar();
+
+    AlunoView.exibirSucesso("Todos os alunos foram removidos.");
+
+    AlunoController.atualizarVisualizacao();
+  },
+
+  /*
+   * Recupera os dados e atualiza a interface.
    */
   atualizarVisualizacao() {
-    /*
-     * Solicita ao Model a lista atual.
-     */
-    const alunos = AlunoModel.listar();
+    const alunos = AlunoService.listar();
 
-    /*
-     * Solicita que a View monte a tabela.
-     */
     AlunoView.exibirLista(alunos);
 
-    /*
-     * Converte o array para texto JSON formatado.
-     */
     const textoJson = JSON.stringify(alunos, null, 2);
 
-    /*
-     * Solicita que a View apresente o JSON.
-     */
     AlunoView.exibirJSON(textoJson);
   },
 };
 
 /*
- * Inicia a aplicação depois que os scripts forem carregados.
+ * Inicia a aplicação.
  */
 AlunoController.iniciar();

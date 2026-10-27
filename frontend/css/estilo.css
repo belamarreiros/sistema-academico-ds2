@@ -220,3 +220,23 @@ pre {
         padding: 18px;
     }
 }
+
+/*
+ * Organiza os botões do formulário.
+ */
+.acoes-formulario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/*
+ * Aparência do botão secundário.
+ */
+.botao-secundario {
+    background-color: #64748b;
+}
+
+.botao-secundario:hover {
+    background-color: #475569;
+}
